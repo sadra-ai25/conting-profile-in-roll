@@ -1,0 +1,29 @@
+services:
+  redis:
+    image: redis:7.0-alpine
+    ports:
+      - "6380:6379"
+      
+  rollway:
+    build: .
+    image: rollway
+    volumes:
+      - ./.env:/app/.env
+      - ./src/ai/weights:/app/src/ai/weights
+      - .:/app
+      - ./src:/app/src
+      - ./outputs:/app/outputs
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    ports:
+      - "8002:8002"
+    env_file: .env
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
