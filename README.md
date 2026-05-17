@@ -88,33 +88,34 @@ docker compose up -d --build
 
 ## API Endpoints
 
+The RTSP pipeline starts automatically on service startup. Use these endpoints to control it:
+
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/health` | Health check and processing status |
-| `POST` | `/start` | Start camera stream processing |
-| `POST` | `/stop` | Stop camera stream processing |
-| `GET` | `/count` | Get current profile count |
-| `GET` | `/report` | Get production report for reporting window |
-| `POST` | `/reset` | Reset counter for new shift |
+| `POST` | `/rtsp/start` | (Re)start RTSP stream processing |
+| `POST` | `/rtsp/stop` | Stop RTSP stream processing |
+| `POST` | `/video` | Upload a video file for analysis (background task) |
+| `POST` | `/reports` | Query profile counts with optional time range filter |
 
-### Example: Start Processing
+### Example: Start RTSP stream
 
 ```bash
-curl -X POST http://localhost:8000/start
+curl -X POST http://localhost:8000/rtsp/start
 ```
 
-### Example: Get Report
+### Example: Query Report for a Time Range
 
 ```bash
-curl http://localhost:8000/report
+curl -X POST http://localhost:8000/reports \
+  -H "Content-Type: application/json" \
+  -d '{"start_time": "2024-01-15 07:00:00", "end_time": "2024-01-15 15:00:00"}'
 ```
 
 ```json
 {
-  "total_count": 847,
-  "report_start": "2024-01-15T07:00:00",
-  "report_end": "2024-01-15T15:00:00",
-  "duration_hours": 8
+  "status": "success",
+  "count": 847,
+  "data": [...]
 }
 ```
 
